@@ -9,9 +9,17 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "lib": ["ESNext"]
+    "lib": [
+      "ESNext"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
   "include": [
-    "src"
+    "**/*.ts"
   ]
 }

@@ -1,4 +1,4 @@
-import { UnpackFunction } from "../types";
+import { UnpackFunction } from "@/types";
 
 export abstract class AbstractNode<Context extends {}> {
     public abstract get<T extends keyof Context>(

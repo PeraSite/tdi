@@ -1,6 +1,6 @@
 import { Node } from "./node";
-import { Assign, ContextGetter, FullyUnpackObject, Intersection, KeysOrCb, MyRecord, Prettify } from "../types";
-import { intersectionKeys } from "../utils";
+import { Assign, ContextGetter, FullyUnpackObject, Intersection, KeysOrCb, MyRecord, Prettify } from "@/types";
+import { intersectionKeys } from "@/utils";
 
 export class Container<Context extends {}> extends Node<Context> {
     static create<Context extends {}>(context?: Context) {
