@@ -1,8 +1,13 @@
-# tdi
+# tdi (tiny di)
+![npm package minimized gzipped size](https://img.shields.io/bundlejs/size/%40perasite%2Ftdi)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/perasite/tdi/test.yml)
+![Codecov](https://img.shields.io/codecov/c/github/PeraSite/tdi)
+![NPM Version](https://img.shields.io/npm/v/%40perasite%2Ftdi)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A 2kB, zero-depdendency, pure, type-safe, DI library for TypeScript.
+A 1kB, zero-depdendency, immutable, type-safe, DI library for TypeScript.
 
-*heavily inspired by [itijs](https://itijs.org/) library*
+*heavily inspired by [itijs](https://itijs.org/) library.*
 
 ## Installation
 ```bash
