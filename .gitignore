@@ -12,3 +12,5 @@ yarn-error.log*
 .idea
 
 dist
+
+.DS_Store
