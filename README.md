@@ -9,12 +9,21 @@ A ~1kB, zero-dependencies, immutable, type-safe, IoC container for TypeScript.
 
 *heavily inspired by [itijs](https://itijs.org/) library.*
 
+## Features
+- Zero runtime dependencies
+- Tiny size (~2kB)
+- No side-effect & Immutable container
+- Type-safe & Intellisense support
+- Supports Promise & async/await
+- Caches resolved value
+
 ## Installation
 ```bash
 pnpm install @perasite/tdi
 ```
 
 ## Usage
+### Basic Usage
 ```typescript
 import { createContainer } from '@perasite/tdi';
 
@@ -29,7 +38,7 @@ class ConsoleLogger implements ILogger {
 };
 
 const container = createContainer().add({
-  foo: 'bar', 
+  foo: 'bar',
   jazz: async () => "rizz",
   logger: (): ILogger => new ConsoleLogger()
 });
@@ -40,10 +49,40 @@ container.items.logger.log('Hello, World!');
 //             ^ { logger: ILogger }
 ```
 
-## Features
-- Zero runtime dependencies
-- Tiny size (~2kB)
-- No side-effect & Immutable container
-- Type-safe & Intellisense support
-- Supports Promise & async/await
-- Caches resolved value
+### Managing Dependencies
+```typescript
+class Foo {
+  constructor(private logger: ILogger) {}
+
+  bar() {
+    this.logger.log('Hello, World!');
+  }
+}
+
+const container = createContainer()
+  .add({ 
+    logger: (): ILogger => new ConsoleLogger(), 
+  })
+  .add(ctx => ({
+	foo: new Foo(ctx.logger)
+  }));
+
+container.items.foo.bar();
+// Output: Hello, World!
+```
+
+### Merging Containers
+```typescript
+const container1 = createContainer().add({ foo: 'bar' });
+const container2 = createContainer().add({ jazz: 'rizz' });
+
+const container = container1.merge(container2);
+
+container.items.foo; // 'bar'
+container.items.jazz; // 'rizz'
+```
+
+### Upsert Dependencies
+```typescript
+const container = createContainer().add({ foo: 'bar' });
+```
