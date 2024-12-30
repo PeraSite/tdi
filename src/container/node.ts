@@ -1,7 +1,6 @@
 import { AbstractNode } from './abstract-node';
 import { ContextGetter, UnpackFunction } from '@/types';
 import { addGetter } from '@/utils';
-import { Container } from './index';
 
 export class Node<Context extends {}> extends AbstractNode<Context> {
     /**
