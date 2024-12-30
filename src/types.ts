@@ -11,8 +11,8 @@ export type Assign<OldContext extends object, NewContext extends object> = {
     })]: Token extends keyof NewContext
         ? NewContext[Token]
         : Token extends keyof OldContext
-            ? OldContext[Token]
-            : never;
+          ? OldContext[Token]
+          : never;
 };
 
 export type Prettify<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
@@ -26,7 +26,9 @@ export type UnpromisifyObject<T> = {
     [K in keyof T]: UnPromisify<T[K]>;
 };
 
-export type FullyUnpackObject<T extends {}> = UnpromisifyObject<UnpackObject<T>>;
+export type FullyUnpackObject<T extends {}> = UnpromisifyObject<
+    UnpackObject<T>
+>;
 
 export type KeysOrCb<Context extends {}> =
     | Array<keyof Context>

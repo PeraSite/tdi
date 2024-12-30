@@ -1,7 +1,7 @@
-import { AbstractNode } from "./abstract-node";
-import { ContextGetter, UnpackFunction } from "@/types";
-import { addGetter } from "@/utils";
-import { Container } from "./index";
+import { AbstractNode } from './abstract-node';
+import { ContextGetter, UnpackFunction } from '@/types';
+import { addGetter } from '@/utils';
+import { Container } from './index';
 
 export class Node<Context extends {}> extends AbstractNode<Context> {
     /**
@@ -21,7 +21,7 @@ export class Node<Context extends {}> extends AbstractNode<Context> {
     }
 
     public get<SearchToken extends keyof Context>(
-        token: SearchToken
+        token: SearchToken,
     ): UnpackFunction<Context[SearchToken]> {
         if (token in this._context) {
             const tokenValue = this._context[token];
@@ -65,7 +65,7 @@ export class Node<Context extends {}> extends AbstractNode<Context> {
     }
 
     public delete<SearchToken extends keyof Context>(
-        token: SearchToken
+        token: SearchToken,
     ): Container<Omit<Context, SearchToken>> {
         delete this._context[token];
         delete this._cache[token];
@@ -87,7 +87,7 @@ export class Node<Context extends {}> extends AbstractNode<Context> {
         [T in keyof Context]: T;
     } {
         return Object.fromEntries(
-            Object.keys(this._context).map(el => [el, el])
+            Object.keys(this._context).map((el) => [el, el]),
         ) as any;
     }
 }

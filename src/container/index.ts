@@ -1,6 +1,14 @@
-import { Node } from "./node";
-import { Assign, ContextGetter, FullyUnpackObject, Intersection, KeysOrCb, MyRecord, Prettify } from "@/types";
-import { intersectionKeys } from "@/utils";
+import { Node } from './node';
+import {
+    Assign,
+    ContextGetter,
+    FullyUnpackObject,
+    Intersection,
+    KeysOrCb,
+    MyRecord,
+    Prettify,
+} from '@/types';
+import { intersectionKeys } from '@/utils';
 
 export class Container<Context extends {}> extends Node<Context> {
     static create<Context extends {}>(context?: Context) {
@@ -20,30 +28,36 @@ export class Container<Context extends {}> extends Node<Context> {
         newContext:
             | NewContext
             | ((
-            containers: ContextGetter<Context>,
-            self: Container<Context>
-        ) => NewContext)
+                  containers: ContextGetter<Context>,
+                  self: Container<Context>,
+              ) => NewContext),
     ): Container<Prettify<Assign<Context, NewContext>>> {
         if (typeof newContext === 'function') {
             // @ts-expect-error - we are sure that newContext is a function that takes containers and self
             const createdContext = newContext(this.items, this);
 
-            const wrappedContext = Object.keys(createdContext).reduce((acc, key) => {
-                // @ts-expect-error - we are sure that newContext is a function that takes containers and self
-                acc[key as keyof NewContext] = (
-                    containers: ContextGetter<Context>,
-                    self: Container<Context>
-                ) => {
+            const wrappedContext = Object.keys(createdContext).reduce(
+                (acc, key) => {
                     // @ts-expect-error - we are sure that newContext is a function that takes containers and self
-                    return newContext(containers, self)[key];
-                };
-                return acc;
-            }, {} as NewContext);
+                    acc[key as keyof NewContext] = (
+                        containers: ContextGetter<Context>,
+                        self: Container<Context>,
+                    ) => {
+                        // @ts-expect-error - we are sure that newContext is a function that takes containers and self
+                        return newContext(containers, self)[key];
+                    };
+                    return acc;
+                },
+                {} as NewContext,
+            );
 
-            return new Container({...this._context, ...wrappedContext}) as any;
+            return new Container({
+                ...this._context,
+                ...wrappedContext,
+            }) as any;
         }
 
-        return new Container({...this._context, ...newContext}) as any;
+        return new Container({ ...this._context, ...newContext }) as any;
     }
 
     public add<
@@ -59,9 +73,9 @@ export class Container<Context extends {}> extends Node<Context> {
         newContextOrCb:
             | NewContext
             | ((
-            items: ContextGetter<Context>,
-            self: Container<Context>
-        ) => NewContext)
+                  items: ContextGetter<Context>,
+                  self: Container<Context>,
+              ) => NewContext),
     ): Container<Prettify<Assign<Context, NewContext>>> {
         const newContext =
             typeof newContextOrCb === 'function'
@@ -70,14 +84,15 @@ export class Container<Context extends {}> extends Node<Context> {
 
         // Step 1: Runtime check for existing tokens in context
         const duplicates = intersectionKeys(newContext, this.getTokens());
-        if (duplicates) throw new Error(`Tokens already exist: ['${duplicates}']`);
+        if (duplicates)
+            throw new Error(`Tokens already exist: ['${duplicates}']`);
 
         // Step 2: If everything is fine add a newContext
         return this.upsert(newContextOrCb);
     }
 
     public include<OtherContext extends {}>(
-        other: Container<OtherContext>
+        other: Container<OtherContext>,
     ): Container<Prettify<Assign<Context, OtherContext>>> {
         const mergedContext = {
             ...this._context,
@@ -89,7 +104,7 @@ export class Container<Context extends {}> extends Node<Context> {
 
     // this can be optimized
     public async getContainerSet<T extends keyof Context>(
-        tokensOrCb: KeysOrCb<Context>
+        tokensOrCb: KeysOrCb<Context>,
     ) {
         const tokens: T[] = this._extractTokens(tokensOrCb);
         const promiseTokens: T[] = [];
@@ -106,7 +121,7 @@ export class Container<Context extends {}> extends Node<Context> {
         } = {} as any;
 
         // Step 1: Assign all values
-        tokens.forEach(token => {
+        tokens.forEach((token) => {
             // @ts-expect-error - we are sure that token is a key of Context
             containerDecoratedMap[token as any] = this.items[token];
         });
@@ -121,7 +136,7 @@ export class Container<Context extends {}> extends Node<Context> {
     }
 
     private _extractTokens<T extends keyof Context>(
-        tokensOrCb: KeysOrCb<Context>
+        tokensOrCb: KeysOrCb<Context>,
     ): T[] {
         if (typeof tokensOrCb === 'function') {
             return tokensOrCb(this.getTokens()) as any;
@@ -132,8 +147,7 @@ export class Container<Context extends {}> extends Node<Context> {
 }
 
 export function createContainer<ParentContext extends {} = {}>(
-    parentContainer?: Container<ParentContext>
+    parentContainer?: Container<ParentContext>,
 ) {
     return Container.createFrom(parentContainer);
 }
-

@@ -1,51 +1,52 @@
 {
-  "name": "@perasite/tdi",
-  "type": "module",
-  "version": "0.0.1",
-  "description": "Tiny Dependency Injection library for TypeScript",
-  "exports": {
-    ".": {
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      },
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
+    "name": "@perasite/tdi",
+    "type": "module",
+    "version": "0.0.1",
+    "description": "Tiny Dependency Injection library for TypeScript",
+    "exports": {
+        ".": {
+            "require": {
+                "types": "./dist/index.d.cts",
+                "default": "./dist/index.cjs"
+            },
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        }
+    },
+    "author": "PeraSite <pretocki3@gmail.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PeraSite/tdi.git"
+    },
+    "files": [
+        "dist"
+    ],
+    "keywords": [
+        "ioc",
+        "di",
+        "dependency",
+        "injection",
+        "container",
+        "typescript"
+    ],
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "scripts": {
+        "build": "tsc"
+    },
+    "devDependencies": {
+        "prettier": "^3.4.2",
+        "tsup": "^8.3.5",
+        "tsx": "^4.19.2",
+        "typescript": "^5.5.3"
+    },
+    "packageManager": "pnpm@9.15.1",
+    "dependencies": {
+        "vite-tsconfig-paths": "^5.1.4",
+        "vitest": "^2.1.8"
     }
-  },
-  "author": "PeraSite <pretocki3@gmail.com>",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PeraSite/tdi.git"
-  },
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "ioc",
-    "di",
-    "dependency",
-    "injection",
-    "container",
-    "typescript"
-  ],
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "scripts": {
-    "build": "tsc"
-  },
-  "devDependencies": {
-    "tsup": "^8.3.5",
-    "tsx": "^4.19.2",
-    "typescript": "^5.5.3"
-  },
-  "packageManager": "pnpm@9.15.1",
-  "dependencies": {
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^2.1.8"
-  }
 }

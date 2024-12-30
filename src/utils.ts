@@ -1,9 +1,9 @@
 export function intersectionKeys(
     needle: { [key: string]: any },
-    haystack: { [key: string]: any }
+    haystack: { [key: string]: any },
 ) {
     const haystackKeys = Object.keys(haystack);
-    const duplicates = haystackKeys.filter(x => x in needle);
+    const duplicates = haystackKeys.filter((x) => x in needle);
     if (duplicates.length === 0) {
         return undefined;
     }
