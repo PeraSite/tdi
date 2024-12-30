@@ -130,3 +130,10 @@ export class Container<Context extends {}> extends Node<Context> {
         }
     }
 }
+
+export function createContainer<ParentContext extends {} = {}>(
+    parentContainer?: Container<ParentContext>
+) {
+    return Container.createFrom(parentContainer);
+}
+
