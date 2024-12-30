@@ -6,4 +6,10 @@ describe('Container Constructor', () => {
         const container = Container.create({ a: 1 });
         expect(container.get('a')).toBe(1);
     });
+
+    it('returns container from container', () => {
+        const container = Container.create({ a: 1 });
+        const newContainer = Container.createFrom(container);
+        expect(newContainer.get('a')).toBe(1);
+    });
 });
