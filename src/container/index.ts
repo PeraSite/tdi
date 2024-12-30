@@ -91,7 +91,7 @@ export class Container<Context extends {}> extends Node<Context> {
         return this.upsert(newContextOrCb);
     }
 
-    public include<OtherContext extends {}>(
+    public merge<OtherContext extends {}>(
         other: Container<OtherContext>,
     ): Container<Prettify<Assign<Context, OtherContext>>> {
         const mergedContext = {
