@@ -5,7 +5,7 @@
 ![NPM Version](https://img.shields.io/npm/v/%40perasite%2Ftdi)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A 1kB, zero-dependencies, immutable, type-safe, IoC container for TypeScript.
+A ~1kB, zero-dependencies, immutable, type-safe, IoC container for TypeScript.
 
 *heavily inspired by [itijs](https://itijs.org/) library.*
 
@@ -29,11 +29,15 @@ class ConsoleLogger implements ILogger {
 };
 
 const container = createContainer().add({
-	logger: (): ILogger => new ConsoleLogger()
+  foo: 'bar', 
+  jazz: async () => "rizz",
+  logger: (): ILogger => new ConsoleLogger()
 });
 
+container.items.foo; // 'bar'
+await container.items.jazz; // 'rizz'
 container.items.logger.log('Hello, World!');
-// Output: Hello, World!
+//             ^ { logger: ILogger }
 ```
 
 ## Features
