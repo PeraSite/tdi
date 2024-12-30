@@ -36,7 +36,8 @@
         "node": ">=18.0.0"
     },
     "scripts": {
-        "build": "tsc"
+        "test": "vitest",
+        "build": "tsup"
     },
     "devDependencies": {
         "prettier": "^3.4.2",
