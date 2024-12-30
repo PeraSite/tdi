@@ -2,7 +2,7 @@
   "name": "@perasite/tdi",
   "type": "module",
   "version": "0.0.1",
-  "description": "Tiny Dependency Injection container for TypeScript",
+  "description": "Tiny Dependency Injection library for TypeScript",
   "exports": {
     ".": {
       "require": {
@@ -21,6 +21,9 @@
     "type": "git",
     "url": "git+https://github.com/PeraSite/tdi.git"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "ioc",
     "di",
