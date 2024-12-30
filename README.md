@@ -5,7 +5,7 @@
 ![NPM Version](https://img.shields.io/npm/v/%40perasite%2Ftdi)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A 1kB, zero-depdendency, immutable, type-safe, DI library for TypeScript.
+A 1kB, zero-dependencies, immutable, type-safe, IoC container for TypeScript.
 
 *heavily inspired by [itijs](https://itijs.org/) library.*
 
@@ -37,7 +37,7 @@ container.items.logger.log('Hello, World!');
 ```
 
 ## Features
-- Zero runtime dependency
+- Zero runtime dependencies
 - Tiny size (~2kB)
 - No side-effect & Immutable container
 - Type-safe & Intellisense support
