@@ -100,4 +100,16 @@ describe('Container Get', () => {
         expect(outerFn).toBeCalledTimes(1);
         expect(innerFn).toBeCalledTimes(2);
     });
+
+    it('throws when adding exist token', () => {
+        const container = createContainer().add({
+            a: 123,
+        });
+        expect(() => {
+            container.add({
+                // @ts-expect-error - adding duplicate token for testing
+                a: 123,
+            });
+        }).toThrowError();
+    });
 });
