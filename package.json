@@ -1,8 +1,8 @@
 {
     "name": "@perasite/tdi",
     "type": "module",
-    "version": "0.0.3",
-    "description": "A 1kb, zero-dependencies, immutable, type-safe IoC container",
+    "version": "0.0.4",
+    "description": "A 1kb, zero-dependencies, immutable, type-safe IoC container for TypeScript",
     "exports": {
         ".": {
             "require": {
