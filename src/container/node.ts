@@ -53,26 +53,6 @@ export class Node<Context extends {}> extends AbstractNode<Context> {
         throw new Error(`Can't find token '${String(token)}' value`);
     }
 
-    protected _updateContext(updatedContext: Context) {
-        for (const [token, value] of Object.entries(updatedContext)) {
-            // Save state and clear cache
-            // @ts-expect-error - we are sure that token is a key of Context
-            this._context[token] = value;
-
-            // @ts-expect-error - we are sure that token is a key of Context
-            delete this._cache[token];
-        }
-    }
-
-    public delete<SearchToken extends keyof Context>(
-        token: SearchToken,
-    ): Container<Omit<Context, SearchToken>> {
-        delete this._context[token];
-        delete this._cache[token];
-
-        return this as any;
-    }
-
     public get items(): ContextGetter<Context> {
         const itemMap = <ContextGetter<Context>>{};
         for (const key in this.getTokens()) {

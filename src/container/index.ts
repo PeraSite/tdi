@@ -2,9 +2,7 @@ import { Node } from './node';
 import {
     Assign,
     ContextGetter,
-    FullyUnpackObject,
     Intersection,
-    KeysOrCb,
     MyRecord,
     Prettify,
 } from '@/types';
@@ -100,49 +98,6 @@ export class Container<Context extends {}> extends Node<Context> {
         } as unknown as Prettify<Assign<Context, OtherContext>>;
 
         return new Container(mergedContext);
-    }
-
-    // this can be optimized
-    public async getContainerSet<T extends keyof Context>(
-        tokensOrCb: KeysOrCb<Context>,
-    ) {
-        const tokens: T[] = this._extractTokens(tokensOrCb);
-        const promiseTokens: T[] = [];
-        const allPromises: any = [];
-        for (const token of tokens) {
-            if (this.items[token] instanceof Promise) {
-                promiseTokens.push(token);
-                allPromises.push(this.items[token]);
-            }
-        }
-
-        const containerDecoratedMap: {
-            [K in T]: FullyUnpackObject<Context>[K];
-        } = {} as any;
-
-        // Step 1: Assign all values
-        tokens.forEach((token) => {
-            // @ts-expect-error - we are sure that token is a key of Context
-            containerDecoratedMap[token as any] = this.items[token];
-        });
-
-        // Step 2: Overwrite Promise like values with promise results
-        const rez = await Promise.all(allPromises);
-        promiseTokens.forEach((token, index) => {
-            containerDecoratedMap[token] = rez[index];
-        });
-
-        return containerDecoratedMap;
-    }
-
-    private _extractTokens<T extends keyof Context>(
-        tokensOrCb: KeysOrCb<Context>,
-    ): T[] {
-        if (typeof tokensOrCb === 'function') {
-            return tokensOrCb(this.getTokens()) as any;
-        } else {
-            return tokensOrCb as any;
-        }
     }
 }
 
