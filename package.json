@@ -1,0 +1,33 @@
+{
+  "name": "tdi",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Tiny Dependency Injection container for TypeScript",
+  "main": "dist/index.js",
+  "author": "PeraSite <pretocki3@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeraSite/tdi.git"
+  },
+  "keywords": [
+    "ioc",
+    "di",
+    "dependency",
+    "injection",
+    "container",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.5.3"
+  },
+  "packageManager": "pnpm@9.15.1"
+}
