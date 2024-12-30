@@ -11,7 +11,7 @@ A ~1kB, zero-dependencies, immutable, type-safe, IoC container for TypeScript.
 
 ## Features
 - Zero runtime dependencies
-- Tiny size (~2kB)
+- Tiny size (~1kB)
 - No side-effect & Immutable container
 - Type-safe & Intellisense support
 - Supports Promise & async/await
@@ -43,13 +43,15 @@ const container = createContainer().add({
   logger: (): ILogger => new ConsoleLogger()
 });
 
-container.items.foo; // 'bar'
+container.get("foo") // 'bar'
+container.items.foo; // 'bar' (same as get())
+
 await container.items.jazz; // 'rizz'
 container.items.logger.log('Hello, World!');
 //             ^ { logger: ILogger }
 ```
 
-### Managing Dependencies
+### Managing Dependencies using Context
 ```typescript
 class Foo {
   constructor(private logger: ILogger) {}
@@ -84,5 +86,28 @@ container.items.jazz; // 'rizz'
 
 ### Upsert Dependencies
 ```typescript
+const originalContainer = createContainer()
+  .add({ name: 'John' })
+  .add((ctx) => ({
+    greeting: `Hello, ${ctx.name}`,
+  }));
+
+const modifiedContainer = originalContainer.upsert({ name: 'Lukas' });
+
+originalContainer.items.greeting; // 'Hello, John'
+modifiedContainer.items.greeting; // 'Hello, Lukas'
+```
+
+### Immutable Pure Container
+```typescript
 const container = createContainer().add({ foo: 'bar' });
+const addedContainer = container.add({ jazz: 'rizz' });
+
+container.items.jazz; // throws Error
+addedContainer.items.jazz; // 'rizz'
+
+const upsertedContainer = container.upsert({ foo: 'baz' });
+
+container.items.foo; // 'bar'
+upsertedContainer.items.foo; // 'baz'
 ```
