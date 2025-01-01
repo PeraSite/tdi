@@ -89,6 +89,9 @@ export class Container<Context extends {}> extends Node<Context> {
         return this.upsert(newContextOrCb);
     }
 
+    /**
+     * @deprecated Use addContainer or upsertContainer instead
+     */
     public merge<OtherContext extends {}>(
         other: Container<OtherContext>,
     ): Container<Prettify<Assign<Context, OtherContext>>> {
@@ -98,6 +101,33 @@ export class Container<Context extends {}> extends Node<Context> {
         } as unknown as Prettify<Assign<Context, OtherContext>>;
 
         return new Container(mergedContext);
+    }
+
+    public addContainer<
+        OtherContext extends Intersection<
+            MyRecord<
+                Context,
+                'You are overwriting this token. It is not safe. Use upsertContainer instead'
+            >,
+            OtherContext
+        >,
+    >(
+        other: Container<OtherContext>,
+    ): Container<Prettify<Assign<Context, OtherContext>>> {
+        const duplicates = intersectionKeys(other._context, this.getTokens());
+        if (duplicates)
+            throw new Error(`Tokens already exist: ['${duplicates}']`);
+
+        return this.upsertContainer(other);
+    }
+
+    public upsertContainer<OtherContext extends {}>(
+        other: Container<OtherContext>,
+    ): Container<Prettify<Assign<Context, OtherContext>>> {
+        return new Container({
+            ...this._context,
+            ...other._context,
+        }) as unknown as Container<Prettify<Assign<Context, OtherContext>>>;
     }
 }
 
