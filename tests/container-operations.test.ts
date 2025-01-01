@@ -118,7 +118,7 @@ describe('Container Operations', () => {
         });
 
         it("creating container doesn't call constructor", () => {
-            const spy = vi.fn(() => "dd");
+            const spy = vi.fn(() => 'dd');
             const container = createContainer().add({ foo: spy });
 
             createContainer().addTokens(container, 'foo');
@@ -127,7 +127,7 @@ describe('Container Operations', () => {
         });
 
         it("creating container doesn't call async constructor", async () => {
-            const spy = vi.fn(async () => "dd");
+            const spy = vi.fn(async () => 'dd');
             const container = createContainer().add({ foo: spy });
 
             createContainer().addTokens(container, 'foo');
@@ -200,6 +200,68 @@ describe('Container Operations', () => {
             // @ts-expect-error - testing for runtime error with non-existent key
             expect(() => target.addTokens(source, 'nonexistent')).toThrow();
         });
+
+        it('resolves nested dependencies', () => {
+            const getName = vi.fn();
+            const getGreeting = vi.fn();
+
+            const rootContainer = createContainer().add((ctx) => ({
+                name: () => {
+                    getName();
+                    return 'root';
+                },
+            }));
+
+            const level1Container = createContainer(rootContainer).add(
+                (ctx) => ({
+                    greeting: () => {
+                        getGreeting();
+                        return `Hello, ${ctx.name}`;
+                    },
+                }),
+            );
+
+            const level2Container = createContainer().addTokens(
+                level1Container,
+                'greeting',
+            );
+
+            expect(level2Container.get('greeting')).toBe('Hello, root');
+            expect(getName).toHaveBeenCalledOnce();
+            expect(getGreeting).toHaveBeenCalledOnce();
+        });
+
+        it('resolves async nested dependencies', async () => {
+            const getName = vi.fn();
+            const getGreeting = vi.fn();
+
+            const rootContainer = createContainer().add((ctx) => ({
+                name: async () => {
+                    getName();
+                    return 'root';
+                },
+            }));
+
+            const level1Container = createContainer(rootContainer).add(
+                (ctx) => ({
+                    greeting: async () => {
+                        getGreeting();
+                        return `Hello, ${await ctx.name}`;
+                    },
+                }),
+            );
+
+            const level2Container = createContainer().addTokens(
+                level1Container,
+                'greeting',
+            );
+
+            await expect(level2Container.get('greeting')).resolves.toBe(
+                'Hello, root',
+            );
+            expect(getName).toHaveBeenCalledOnce();
+            expect(getGreeting).toHaveBeenCalledOnce();
+        });
     });
 
     describe('upsertTokens', () => {
@@ -242,6 +304,80 @@ describe('Container Operations', () => {
             const result = container1.upsertTokens(container2, 'name');
 
             expect(result.get('greeting')).toBe('Hello, Jane');
+        });
+
+        it('resolves nested dependencies', () => {
+            const getName = vi.fn();
+            const getGreeting = vi.fn();
+
+            const rootContainer = createContainer().add((ctx) => ({
+                name: () => {
+                    getName();
+                    return 'root';
+                },
+            }));
+
+            const level1Container = createContainer(rootContainer).add(
+                (ctx) => ({
+                    greeting: () => {
+                        getGreeting();
+                        return `Hello, ${ctx.name}`;
+                    },
+                }),
+            );
+
+            const level2Container = createContainer().addTokens(
+                level1Container,
+                'greeting',
+            );
+
+            const level3Container = createContainer()
+                .add({
+                    greeting: 'WRONG STRING',
+                })
+                .upsertTokens(level2Container, 'greeting');
+
+            expect(level3Container.get('greeting')).toBe('Hello, root');
+            expect(getName).toHaveBeenCalledOnce();
+            expect(getGreeting).toHaveBeenCalledOnce();
+        });
+
+        it('resolves async nested dependencies', async () => {
+            const getName = vi.fn();
+            const getGreeting = vi.fn();
+
+            const rootContainer = createContainer().add((ctx) => ({
+                name: async () => {
+                    getName();
+                    return 'root';
+                },
+            }));
+
+            const level1Container = createContainer(rootContainer).add(
+                (ctx) => ({
+                    greeting: async () => {
+                        getGreeting();
+                        return `Hello, ${await ctx.name}`;
+                    },
+                }),
+            );
+
+            const level2Container = createContainer().addTokens(
+                level1Container,
+                'greeting',
+            );
+
+            const level3Container = createContainer()
+                .add({
+                    greeting: 'WRONG STRING',
+                })
+                .upsertTokens(level2Container, 'greeting');
+
+            await expect(level3Container.get('greeting')).resolves.toBe(
+                'Hello, root',
+            );
+            expect(getName).toHaveBeenCalledOnce();
+            expect(getGreeting).toHaveBeenCalledOnce();
         });
     });
 

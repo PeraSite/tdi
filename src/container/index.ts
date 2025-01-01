@@ -4,7 +4,7 @@ import {
     ContextGetter,
     Intersection,
     MyRecord,
-    Prettify
+    Prettify,
 } from '@/types';
 import { intersectionKeys } from '@/utils';
 
@@ -138,13 +138,13 @@ export class Container<Context extends {}> extends Node<Context> {
         other: Container<OtherContext>,
         ...keys: K[]
     ): Container<Prettify<Assign<Context, Pick<OtherContext, K>>>> {
-        if(!keys.every(key => key in other._context)) {
+        if (!keys.every((key) => key in other._context)) {
             throw new Error('Tokens not found in other container');
         }
 
         const newContext = keys.reduce(
             (acc, key) => {
-                acc[key] = other._context[key];
+                acc[key] = (() => other.get(key)) as unknown as OtherContext[K];
                 return acc;
             },
             {} as Pick<OtherContext, K>,
@@ -154,16 +154,13 @@ export class Container<Context extends {}> extends Node<Context> {
         return this.add(newContext);
     }
 
-    public upsertTokens<
-        OtherContext extends {},
-        K extends keyof OtherContext,
-    >(
+    public upsertTokens<OtherContext extends {}, K extends keyof OtherContext>(
         other: Container<OtherContext>,
         ...keys: K[]
     ): Container<Prettify<Assign<Context, Pick<OtherContext, K>>>> {
         const newContext = keys.reduce(
             (acc, key) => {
-                acc[key] = other._context[key];
+                acc[key] = (() => other.get(key)) as unknown as OtherContext[K];
                 return acc;
             },
             {} as Pick<OtherContext, K>,
