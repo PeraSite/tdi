@@ -36,7 +36,8 @@
         "node": ">=18.0.0"
     },
     "scripts": {
-        "test": "vitest",
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage",
         "build": "tsup"
     },
     "devDependencies": {

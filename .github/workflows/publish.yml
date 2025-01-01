@@ -1,13 +1,12 @@
-name: Run tests and upload coverage
+name: Build and Publish to npm
 
 on:
   push:
     branches: main
 
 jobs:
-  test:
-    name: Run tests and collect coverage
-    runs-on: ubuntu-latest
+  build:
+    name: Build and Publish
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,11 +22,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run tests with coverage
-        run: pnpm test:coverage
+      - name: Run tests
+        run: pnpm test
 
-      - name: Upload results to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Build
+        run: pnpm build
+
+      - name: Publish to npm
+        id: publish
+        uses: JS-DevTools/npm-publish@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: PeraSite/tdi
+          token: ${{ secrets.NPM_TOKEN }}
