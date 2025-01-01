@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createContainer } from '@/container';
 
 describe('Container Operations', () => {
@@ -115,6 +115,15 @@ describe('Container Operations', () => {
             const merged = container1.addTokens(container2, 'title');
             expect(merged.get('greeting')).toBe('Hello, John');
             expect(merged.get('title')).toBe('Mr.');
+        });
+
+        it("creating container doesn't call constructor", () => {
+            const spy = vi.fn(() => "dd");
+            const container = createContainer().add({ foo: spy });
+
+            const target = createContainer().addTokens(container, 'foo');
+
+            expect(spy).not.toHaveBeenCalled();
         });
 
         it('adds specific tokens from another container', () => {

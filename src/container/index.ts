@@ -141,10 +141,10 @@ export class Container<Context extends {}> extends Node<Context> {
     ): Container<Prettify<Assign<Context, Pick<OtherContext, K>>>> {
         const newContext = keys.reduce(
             (acc, key) => {
-                acc[key] = other.get(key);
+                acc[key] = other._context[key];
                 return acc;
             },
-            {} as Pick<UnpackObject<OtherContext>, K>,
+            {} as Pick<OtherContext, K>,
         );
 
         // @ts-expect-error - we are sure that newContext is a valid context for new container
