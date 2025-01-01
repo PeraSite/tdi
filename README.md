@@ -32,7 +32,7 @@ interface ILogger {
 
 class ConsoleLogger implements ILogger {
   log(message: string) {
-	console.log(message);
+    console.log(message);
   }
 };
 
@@ -65,7 +65,7 @@ const container = createContainer()
     logger: (): ILogger => new ConsoleLogger(), 
   })
   .add(ctx => ({
-	foo: new Foo(ctx.logger)
+    foo: new Foo(ctx.logger)
   }));
 
 container.items.foo.bar();
