@@ -4,8 +4,7 @@ import {
     ContextGetter,
     Intersection,
     MyRecord,
-    Prettify,
-    UnpackObject,
+    Prettify
 } from '@/types';
 import { intersectionKeys } from '@/utils';
 
