@@ -205,7 +205,7 @@ describe('Container Operations', () => {
             const getName = vi.fn();
             const getGreeting = vi.fn();
 
-            const rootContainer = createContainer().add((ctx) => ({
+            const rootContainer = createContainer().add(() => ({
                 name: () => {
                     getName();
                     return 'root';
@@ -235,7 +235,7 @@ describe('Container Operations', () => {
             const getName = vi.fn();
             const getGreeting = vi.fn();
 
-            const rootContainer = createContainer().add((ctx) => ({
+            const rootContainer = createContainer().add(() => ({
                 name: async () => {
                     getName();
                     return 'root';
@@ -310,7 +310,7 @@ describe('Container Operations', () => {
             const getName = vi.fn();
             const getGreeting = vi.fn();
 
-            const rootContainer = createContainer().add((ctx) => ({
+            const rootContainer = createContainer().add(() => ({
                 name: () => {
                     getName();
                     return 'root';
@@ -346,7 +346,7 @@ describe('Container Operations', () => {
             const getName = vi.fn();
             const getGreeting = vi.fn();
 
-            const rootContainer = createContainer().add((ctx) => ({
+            const rootContainer = createContainer().add(() => ({
                 name: async () => {
                     getName();
                     return 'root';
