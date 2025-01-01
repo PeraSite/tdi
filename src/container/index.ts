@@ -139,6 +139,10 @@ export class Container<Context extends {}> extends Node<Context> {
         other: Container<OtherContext>,
         ...keys: K[]
     ): Container<Prettify<Assign<Context, Pick<OtherContext, K>>>> {
+        if(!keys.every(key => key in other._context)) {
+            throw new Error('Tokens not found in other container');
+        }
+
         const newContext = keys.reduce(
             (acc, key) => {
                 acc[key] = other._context[key];

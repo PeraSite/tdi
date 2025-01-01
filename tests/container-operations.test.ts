@@ -121,7 +121,7 @@ describe('Container Operations', () => {
             const spy = vi.fn(() => "dd");
             const container = createContainer().add({ foo: spy });
 
-            const target = createContainer().addTokens(container, 'foo');
+            createContainer().addTokens(container, 'foo');
 
             expect(spy).not.toHaveBeenCalled();
         });
