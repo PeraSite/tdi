@@ -5,6 +5,7 @@ import {
     Intersection,
     MyRecord,
     Prettify,
+    UnpackObject,
 } from '@/types';
 import { intersectionKeys } from '@/utils';
 
@@ -90,17 +91,12 @@ export class Container<Context extends {}> extends Node<Context> {
     }
 
     /**
-     * @deprecated Use addContainer or upsertContainer instead
+     * @deprecated Use addContainer to safely add tokens or upsertContainer to overwrite tokens instead
      */
     public merge<OtherContext extends {}>(
         other: Container<OtherContext>,
     ): Container<Prettify<Assign<Context, OtherContext>>> {
-        const mergedContext = {
-            ...this._context,
-            ...other._context,
-        } as unknown as Prettify<Assign<Context, OtherContext>>;
-
-        return new Container(mergedContext);
+        return this.upsertContainer(other);
     }
 
     public addContainer<
@@ -128,6 +124,51 @@ export class Container<Context extends {}> extends Node<Context> {
             ...this._context,
             ...other._context,
         }) as unknown as Container<Prettify<Assign<Context, OtherContext>>>;
+    }
+
+    public addTokens<
+        OtherContext extends Intersection<
+            MyRecord<
+                Context,
+                'You are overwriting this token. It is not safe. Use an unsafe `upsertTokens` method'
+            >,
+            Pick<OtherContext, K>
+        >,
+        K extends keyof OtherContext,
+    >(
+        other: Container<OtherContext>,
+        ...keys: K[]
+    ): Container<Prettify<Assign<Context, Pick<OtherContext, K>>>> {
+        const newContext = keys.reduce(
+            (acc, key) => {
+                acc[key] = other.get(key);
+                return acc;
+            },
+            {} as Pick<UnpackObject<OtherContext>, K>,
+        );
+
+        // @ts-expect-error - we are sure that newContext is a valid context for new container
+        return this.add(newContext);
+    }
+
+    public upsertTokens<
+        OtherContext extends {},
+        K extends keyof OtherContext,
+    >(
+        other: Container<OtherContext>,
+        ...keys: K[]
+    ): Container<Prettify<Assign<Context, Pick<OtherContext, K>>>> {
+        const newContext = keys.reduce(
+            (acc, key) => {
+                acc[key] = other.get(key);
+                return acc;
+            },
+            {} as Pick<UnpackObject<OtherContext>, K>,
+        );
+
+        return this.upsert(newContext) as Container<
+            Prettify<Assign<Context, Pick<OtherContext, K>>>
+        >;
     }
 }
 
