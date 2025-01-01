@@ -126,6 +126,15 @@ describe('Container Operations', () => {
             expect(spy).not.toHaveBeenCalled();
         });
 
+        it("creating container doesn't call async constructor", async () => {
+            const spy = vi.fn(async () => "dd");
+            const container = createContainer().add({ foo: spy });
+
+            createContainer().addTokens(container, 'foo');
+
+            expect(spy).not.toHaveBeenCalled();
+        });
+
         it('adds specific tokens from another container', () => {
             const container1 = createContainer().add({ foo: 'bar' });
             const container2 = createContainer().add({
