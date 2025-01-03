@@ -1,30 +1,58 @@
-import { ContextGetter, UnpackFunction, Assign, Intersection, MyRecord, Prettify } from '@/types';
+import {
+    ContextGetter,
+    UnpackFunction,
+    Assign,
+    Intersection,
+    MyRecord,
+    Prettify,
+} from '@/types';
 import { addGetter, intersectionKeys } from '@/utils';
 
+/**
+ * IoC Container class for managing dependency injection
+ */
 export class Container<Context extends {}> {
     /**
-     * When we create a new class instance or function, we cache the output
+     * Cache for storing resolved values
      */
     protected readonly _cache: { [K in keyof Context]?: any };
 
     /**
-     * Holds key:value factories in a form token:factory
+     * Context object containing token-value pairs
      */
     protected readonly _context: Context;
 
+    /**
+     * Creates a new Container instance
+     * @param context Initial context object
+     */
     static create<Context extends {}>(context?: Context) {
         return new Container(context);
     }
 
+    /**
+     * Creates a new Container instance from an existing container
+     * @param container Source container to copy from
+     */
     static createFrom<Context extends {}>(container?: Container<Context>) {
         return new Container(container?._context);
     }
 
-    constructor(_context?: Context) {
-        this._context = _context ?? <Context>{};
+    /**
+     * Initializes the container with the given context
+     * @param context Initial context object
+     */
+    constructor(context?: Context) {
+        this._context = context ?? <Context>{};
         this._cache = {};
     }
 
+    /**
+     * Gets a value from the container by token
+     * @param token The token to retrieve
+     * @returns The value associated with the token
+     * @throws Error if the token is not found in the container
+     */
     public get<SearchToken extends keyof Context>(
         token: SearchToken,
     ): UnpackFunction<Context[SearchToken]> {
@@ -58,6 +86,10 @@ export class Container<Context extends {}> {
         throw new Error(`Can't find token '${String(token)}' value`);
     }
 
+    /**
+     * Gets all items in the container as a getter object
+     * @returns An object with getters for each token in the container
+     */
     public get items(): ContextGetter<Context> {
         const itemMap = <ContextGetter<Context>>{};
         for (const key in this.getTokens()) {
@@ -68,6 +100,10 @@ export class Container<Context extends {}> {
         return itemMap;
     }
 
+    /**
+     * Gets all available tokens in the container
+     * @returns An object with token names as keys
+     */
     public getTokens(): {
         [T in keyof Context]: T;
     } {
@@ -76,7 +112,12 @@ export class Container<Context extends {}> {
         ) as any;
     }
 
-    // SAVE: NewContext extends {! [T in keyof NewContext]: NewContext[T] }
+    /**
+     * Updates or inserts new values into the container
+     * @param newContext New context object or function that returns context
+     * @returns New container with updated or inserted values
+     * @throws Error if the context function fails to execute
+     */
     public upsert<NewContext extends {}>(
         newContext:
             | NewContext
@@ -113,8 +154,13 @@ export class Container<Context extends {}> {
         return new Container({ ...this._context, ...newContext }) as any;
     }
 
+    /**
+     * Safely adds new values to the container without overwriting existing ones
+     * @param newContextOrCb New context object or function that returns context
+     * @returns New container with added values
+     * @throws Error if any tokens already exist in the current container
+     */
     public add<
-        // This "magic" type gives user an Error in an IDE with a helpful message
         NewContext extends Intersection<
             MyRecord<
                 Context,
@@ -135,17 +181,18 @@ export class Container<Context extends {}> {
                 ? newContextOrCb(this.items, this)
                 : newContextOrCb;
 
-        // Step 1: Runtime check for existing tokens in context
         const duplicates = intersectionKeys(newContext, this.getTokens());
         if (duplicates)
             throw new Error(`Tokens already exist: ['${duplicates}']`);
 
-        // Step 2: If everything is fine add a newContext
         return this.upsert(newContextOrCb);
     }
 
     /**
+     * Merges another container into this one
      * @deprecated Use addContainer to safely add tokens or upsertContainer to overwrite tokens instead
+     * @param other Container to merge tokens from
+     * @returns New container with merged tokens
      */
     public merge<OtherContext extends {}>(
         other: Container<OtherContext>,
@@ -153,6 +200,12 @@ export class Container<Context extends {}> {
         return this.upsertContainer(other);
     }
 
+    /**
+     * Adds tokens from another container without overwriting existing ones
+     * @param other Container to add tokens from
+     * @returns New container with added tokens
+     * @throws Error if any tokens already exist in the current container
+     */
     public addContainer<
         OtherContext extends Intersection<
             MyRecord<
@@ -171,6 +224,11 @@ export class Container<Context extends {}> {
         return this.upsertContainer(other);
     }
 
+    /**
+     * Updates or inserts tokens from another container
+     * @param other Container to merge tokens from
+     * @returns New container with merged tokens
+     */
     public upsertContainer<OtherContext extends {}>(
         other: Container<OtherContext>,
     ): Container<Prettify<Assign<Context, OtherContext>>> {
@@ -180,6 +238,14 @@ export class Container<Context extends {}> {
         }) as unknown as Container<Prettify<Assign<Context, OtherContext>>>;
     }
 
+    /**
+     * Adds specific tokens from another container
+     * @param other Container to add tokens from
+     * @param keys Array of token keys to add
+     * @returns New container with added tokens
+     * @throws Error if any specified tokens are not found in the source container
+     * @throws Error if any tokens already exist in the current container
+     */
     public addTokens<
         OtherContext extends Intersection<
             MyRecord<
@@ -199,34 +265,46 @@ export class Container<Context extends {}> {
 
         const newContext = keys.reduce(
             (acc, key) => {
-                acc[key] = (() => other.get(key)) as unknown as OtherContext[K];
+                // @ts-expect-error - we are sure that newContext is a function that takes containers and self
+                acc[key] = () => other.get(key);
                 return acc;
             },
             {} as Pick<OtherContext, K>,
         );
 
-        // @ts-expect-error - we are sure that newContext is a valid context for new container
+        // @ts-expect-error - we are sure that newContext is a function that takes containers and self
         return this.add(newContext);
     }
 
+    /**
+     * Updates specific tokens from another container
+     * @param other Container to update tokens from
+     * @param keys Array of token keys to update
+     * @returns New container with updated tokens
+     * @throws Error if any specified tokens are not found in the source container
+     */
     public upsertTokens<OtherContext extends {}, K extends keyof OtherContext>(
         other: Container<OtherContext>,
         ...keys: K[]
     ): Container<Prettify<Assign<Context, Pick<OtherContext, K>>>> {
         const newContext = keys.reduce(
             (acc, key) => {
-                acc[key] = (() => other.get(key)) as unknown as OtherContext[K];
+                // @ts-expect-error - we are sure that newContext is a function that takes containers and self
+                acc[key] = () => other.get(key);
                 return acc;
             },
             {} as Pick<OtherContext, K>,
         );
 
-        return this.upsert(newContext) as Container<
-            Prettify<Assign<Context, Pick<OtherContext, K>>>
-        >;
+        return this.upsert(newContext);
     }
 }
 
+/**
+ * Creates a new container instance
+ * @param parentContainer Parent container to inherit from
+ * @returns New container instance
+ */
 export function createContainer<ParentContext extends {} = {}>(
     parentContainer?: Container<ParentContext>,
 ) {
