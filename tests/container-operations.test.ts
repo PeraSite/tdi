@@ -379,6 +379,26 @@ describe('Container Operations', () => {
             expect(getName).toHaveBeenCalledOnce();
             expect(getGreeting).toHaveBeenCalledOnce();
         });
+
+        it('throws when trying to upsert non-existent tokens', () => {
+            const source = createContainer().add({ existing: 'value' });
+            const target = createContainer();
+
+            // @ts-expect-error - testing for runtime error with non-existent key
+            expect(() => target.upsertTokens(source, 'nonexistent')).toThrow(
+                'Tokens not found in other container',
+            );
+        });
+
+        it('throws when trying to upsert multiple tokens with some non-existent', () => {
+            const source = createContainer().add({ existing: 'value' });
+            const target = createContainer();
+
+            expect(() =>
+                // @ts-expect-error - testing for runtime error with non-existent key
+                target.upsertTokens(source, 'existing', 'nonexistent'),
+            ).toThrow('Tokens not found in other container');
+        });
     });
 
     describe('merge (deprecated)', () => {

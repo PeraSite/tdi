@@ -287,6 +287,10 @@ export class Container<Context extends {}> {
         other: Container<OtherContext>,
         ...keys: K[]
     ): Container<Prettify<Assign<Context, Pick<OtherContext, K>>>> {
+        if (!keys.every((key) => key in other._context)) {
+            throw new Error('Tokens not found in other container');
+        }
+
         const newContext = keys.reduce(
             (acc, key) => {
                 // @ts-expect-error - we are sure that newContext is a function that takes containers and self
