@@ -1,14 +1,17 @@
-import { Node } from './node';
-import {
-    Assign,
-    ContextGetter,
-    Intersection,
-    MyRecord,
-    Prettify,
-} from '@/types';
-import { intersectionKeys } from '@/utils';
+import { ContextGetter, UnpackFunction, Assign, Intersection, MyRecord, Prettify } from '@/types';
+import { addGetter, intersectionKeys } from '@/utils';
 
-export class Container<Context extends {}> extends Node<Context> {
+export class Container<Context extends {}> {
+    /**
+     * When we create a new class instance or function, we cache the output
+     */
+    protected readonly _cache: { [K in keyof Context]?: any };
+
+    /**
+     * Holds key:value factories in a form token:factory
+     */
+    protected readonly _context: Context;
+
     static create<Context extends {}>(context?: Context) {
         return new Container(context);
     }
@@ -18,7 +21,59 @@ export class Container<Context extends {}> extends Node<Context> {
     }
 
     constructor(_context?: Context) {
-        super(_context);
+        this._context = _context ?? <Context>{};
+        this._cache = {};
+    }
+
+    public get<SearchToken extends keyof Context>(
+        token: SearchToken,
+    ): UnpackFunction<Context[SearchToken]> {
+        if (token in this._context) {
+            const tokenValue = this._context[token];
+
+            if (token in this._cache) {
+                return this._cache[token];
+            }
+
+            if (typeof tokenValue === 'function') {
+                if (tokenValue.length > 0) {
+                    const providedValue = tokenValue(this.items, this);
+                    const value =
+                        typeof providedValue === 'function'
+                            ? providedValue()
+                            : providedValue;
+                    this._cache[token] = value;
+                    return value;
+                }
+
+                const providedValue = tokenValue();
+                this._cache[token] = providedValue;
+                return providedValue;
+            }
+
+            this._cache[token] = tokenValue;
+            return tokenValue as any;
+        }
+
+        throw new Error(`Can't find token '${String(token)}' value`);
+    }
+
+    public get items(): ContextGetter<Context> {
+        const itemMap = <ContextGetter<Context>>{};
+        for (const key in this.getTokens()) {
+            addGetter(itemMap, key, () => {
+                return this.get(key as any);
+            });
+        }
+        return itemMap;
+    }
+
+    public getTokens(): {
+        [T in keyof Context]: T;
+    } {
+        return Object.fromEntries(
+            Object.keys(this._context).map((el) => [el, el]),
+        ) as any;
     }
 
     // SAVE: NewContext extends {! [T in keyof NewContext]: NewContext[T] }
