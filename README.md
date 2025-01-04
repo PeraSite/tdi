@@ -29,103 +29,127 @@ yarn add @perasite/tdi       # yarn
 ## 📘 Usage Examples
 
 ### 1️⃣ Basic DI Container
+Create a container and add dependencies with automatic type inference. Access dependencies through the `items` property or `get()` method.
+
 ```typescript
 import { createContainer } from '@perasite/tdi';
 
+// Create a container with configuration
 const container = createContainer()
   .add({
     config: {
-      apiUrl: 'https://api.example.com',
+      apiUrl: 'https://api.example.com', 
       timeout: 5000
     }
-  })
+  });
 
-// Type is inferred automatically!
+// Access dependencies with full type safety
 container.items.config;    // { apiUrl: string; timeout: number }
+container.get('config');  // does the same
+```
+
+Dependencies can be values, functions, or promises. Function dependencies are evaluated when accessed.
+```typescript
+const container = createContainer()
+  .add({
+    lazyValue: () => 'Hello, world'
+    asyncValue: async () => 'Hello, async world'
+  });
+
+container.items.lazyValue;  // 'Hello, world'
+await container.items.asyncValue; // 'Hello, async world'
 ```
 
 ### 2️⃣ Compile-time Type Safety
+The container prevents errors like duplicate dependencies and accessing non-existent values at compile time.
+Use `upsert()` to safely update existing values when needed.
+
 ```typescript
 const container = createContainer()
   .add({ 
     config: { apiUrl: 'https://api.example.com' }
   });
 
-// ❌ Compile Error: Duplicate key 'config'
+// ❌ Error: Unsafe overwrite. Use `upsert` instead
 container.add({ 
-  config: { timeout: 5000 }  // Type error!
+  config: { timeout: 5000 }
 });
 
-// ❌ Compile Error: Missing dependency
+// ❌ Error: Property `missing` does not exist
 container.add((ctx) => ({
-  service: () => ctx.missing  // Type error!
+  service: () => ctx.missing 
 }));
 
-// ✅ Valid operations
+// ✅ Valid
 container
-  .upsert({ config: { apiUrl: 'https://new-api.com' } })  // OK
+  .upsert({ config: { apiUrl: 'https://new-api.com' } })
   .add((ctx) => ({
     newService: () => ctx.config.apiUrl
-  }));  // OK
+  }));
 ```
 
-### 3️⃣ Container chaining & Composition
+### 3️⃣ Dependency Resolution
+Dependencies are lazily evaluated, ensuring they always reflect the current state when accessed through context.
+
 ```typescript
-const container = createContainer()
+const userContainer = createContainer()
     .add({
-        name: 'John' // Value is eagerly resolved
-    })
+        name: 'John'
+    });
+
+const greetContainer = createContainer(userContainer)
     .add((ctx) => ({
-        greet: () => `Hello, ${ctx.name}!` // Value is lazily resolved
+        greet: () => `Hello, ${ctx.name}!`
     }))
     .add((ctx) => ({
         formal: () => `${ctx.greet} How are you?`
     }));
 
-// Upserting values (updates existing or adds new)
-const updated = container.upsert({
-    name: 'Jane',    // Updates existing
-    title: 'Dr.'     // Adds new
+const janeContainer = greetContainer.upsert({
+    name: 'Jane'
 });
 
-updated.items.name;   // 'Jane'
-updated.items.title;  // 'Dr.'
-updated.items.formal; // 'Hello, Jane! How are you?'
+// greet, formal are now automatically updated
+janeContainer.items.name;   // 'Jane'
+janeContainer.items.greet;  // 'Hello, Jane!'
+janeContainer.items.formal; // 'Hello, Jane! How are you?'
 ```
 
 ### 4️⃣ Container Operations
+Compose containers using various operations to manage dependencies effectively:
+- `addContainer()`: Import all dependencies from another container
+- `upsertContainer()`: Override existing dependencies from another container
+- `addTokens()`: Import specific dependencies
+- `upsertTokens()`: Override specific dependencies
+
 ```typescript
-// Adding specific tokens from another container
-const source = createContainer()
-  .add({ a: 1, b: 2, c: 3 });
+// Base container with configuration
+const baseContainer = createContainer()
+  .add({ config: { apiUrl: 'https://api.example.com' } });
 
-const target = createContainer()
-  .addTokens(source, 'a', 'b');     // Only adds 'a' and 'b'
-  
-// Upserting specific tokens
-const updatedTarget = target
-  .upsertTokens(source, 'a');     // Only updates 'a'
+// Add all dependencies
+const extendedContainer = createContainer()
+  .addContainer(baseContainer)
+  .add({ additionalConfig: { timeout: 5000 } });
 
-// Merging containers
-const merged = container
-  .addContainer(updated)            // Adds all tokens
-  .upsertContainer(source);         // Updates existing tokens
+// Override existing dependencies
+const updatedContainer = createContainer()
+  .add({ config: { apiUrl: 'https://new-api.com' } })
+  .upsertContainer(baseContainer)
+
+// Import specific dependencies
+const specificContainer = createContainer()
+  .addTokens(baseContainer, 'config')
+
+// Override specific dependencies
+const specificUpdatedContainer = createContainer()
+  .add({ config: { apiUrl: 'https://new-api.com' } })
+  .upsertTokens(baseContainer, 'config');
 ```
 
-### 5️⃣ Async Promise Resolving
-```typescript
-const container = createContainer().add({
-  timeConsumingTask: async () => {
-    // Do API stuff
-    return 'John';
-  },
-});
+### 5️⃣ Complex scenarios with testing
+Create test environments by overriding production dependencies with mocks using `upsert`.
 
-await container.items.timeConsumingTask; // "John"
-```
-
-
-### 6️⃣ Complex scenarios with testing
 ```typescript
 interface IUserRepository {
   getUser(id: number): Promise<string>;
@@ -146,6 +170,7 @@ class UserService {
   }
 }
 
+// Production container with real implementation
 const prodContainer = createContainer()
   .add({
     userRepository: (): IUserRepository => new UserRepository(),
@@ -154,6 +179,7 @@ const prodContainer = createContainer()
     userService: new UserService(ctx.userRepository),
   }));
 
+// Test container with mock implementation
 const testContainer = prodContainer
   .upsert({
     userRepository: (): IUserRepository => ({
