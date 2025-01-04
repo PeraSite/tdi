@@ -115,13 +115,54 @@ const merged = container
 ### 5️⃣ Async Promise Resolving
 ```typescript
 const container = createContainer().add({
-    timeConsumingTask: async () => {
-        // Do API stuff
-        return 'John';
-    },
+  timeConsumingTask: async () => {
+    // Do API stuff
+    return 'John';
+  },
 });
 
 await container.items.timeConsumingTask; // "John"
+```
+
+
+### 6️⃣ Complex scenarios with testing
+```typescript
+interface IUserRepository {
+  getUser(id: number): Promise<string>;
+}
+
+class UserRepository implements IUserRepository {
+  async getUser(id: number): Promise<string> {
+    return `User ${id} from Database`;
+  }
+}
+
+class UserService {
+  constructor(private userRepository: IUserRepository) {
+  }
+
+  async printName(id: number) {
+    console.log(await this.userRepository.getUser(id));
+  }
+}
+
+const prodContainer = createContainer()
+  .add({
+    userRepository: (): IUserRepository => new UserRepository(),
+  })
+  .add(ctx => ({
+    userService: new UserService(ctx.userRepository),
+  }));
+
+const testContainer = prodContainer
+  .upsert({
+    userRepository: (): IUserRepository => ({
+      getUser: async () => 'Mock User',
+    }),
+  });
+
+await prodContainer.get('userService').printName(1); // User 1 from Database
+await testContainer.get('userService').printName(1); // Mock User
 ```
 
 ## 💬 Support
