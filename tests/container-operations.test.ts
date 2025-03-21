@@ -413,4 +413,90 @@ describe('Container Operations', () => {
             expect(mergeResult.get('foo')).toBe(upsertResult.get('foo'));
         });
     });
+
+    describe('build', () => {
+        it('returns an object with all resolved values', () => {
+            const container = createContainer().add({
+                foo: 'bar',
+                number: 123,
+                boolean: true
+            });
+
+            const built = container.build();
+            
+            expect(built).toEqual({
+                foo: 'bar',
+                number: 123,
+                boolean: true
+            });
+        });
+
+        it('resolves function tokens', () => {
+            const container = createContainer().add({
+                value: 'original',
+                computed: () => 'computed value',
+            }).add(ctx => ({
+                dependent: `dependent on ${ctx.value}`
+            }));
+
+            const built = container.build();
+            
+            expect(built).toEqual({
+                value: 'original',
+                computed: 'computed value',
+                dependent: 'dependent on original'
+            });
+        });
+
+        it('resolves nested function results', () => {
+            const fn = vi.fn(() => 'inner value');
+            const container = createContainer().add({
+                outer: {
+                    inner: fn,
+                },
+            });
+
+            const built = container.build();
+            
+            expect(built.outer.inner).toBe(fn);
+            expect(fn).toHaveBeenCalledTimes(0); // The inner function is not resolved by build
+        });
+
+        it('properly handles async values', async () => {
+            const container = createContainer().add({
+                sync: 'sync value',
+                async: async () => 'async value'
+            });
+
+            const built = container.build();
+            
+            expect(built.sync).toBe('sync value');
+            await expect(built.async).resolves.toBe('async value');
+        });
+
+        it('builds all values from a complex container', () => {
+            const container = createContainer()
+                .add({
+                    name: 'John',
+                    age: 30
+                })
+                .add(({ age, name }) => ({
+                    greeting: `Hello, ${name}`,
+                    isAdult: age >= 18
+                }))
+                .add({
+                    location: 'New York'
+                });
+
+            const built = container.build();
+            
+            expect(built).toEqual({
+                name: 'John',
+                age: 30,
+                greeting: 'Hello, John',
+                isAdult: true,
+                location: 'New York'
+            });
+        });
+    });
 });

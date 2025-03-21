@@ -302,6 +302,21 @@ export class Container<Context extends {}> {
 
         return this.upsert(newContext);
     }
+
+    /**
+     * Builds and returns all resolved values from the container's context
+     * @returns An object containing all resolved values from the context
+     */
+    public build(): { [K in keyof Context]: UnpackFunction<Context[K]> } {
+        const result = {} as { [K in keyof Context]: UnpackFunction<Context[K]> };
+        const tokens = this.getTokens();
+        
+        for (const key in tokens) {
+            result[key] = this.get(key);
+        }
+        
+        return result;
+    }
 }
 
 /**
