@@ -1,4 +1,4 @@
-# 🎯 tdi
+# tdi(tiny di)
 
 ![npm package minimized gzipped size](https://img.shields.io/bundlejs/size/%40perasite%2Ftdi)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/perasite/tdi/test.yml)
@@ -6,9 +6,9 @@
 ![NPM Version](https://img.shields.io/npm/v/%40perasite%2Ftdi)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> 🚀 A tiny, zero-dependencies, immutable, type-safe IoC container for TypeScript.
+> A tiny, zero-dependencies, immutable, type-safe IoC container for TypeScript.
 
-## 🌟 Why tdi?
+## Why tdi?
 
 - 📦 **Tiny**: < 1KB minified + gzipped
 - 🧩 **Simple**: No decorators, reflection, or magic strings
@@ -16,7 +16,7 @@
 - ⚡ **Async Support**: First-class support for async dependencies
 - 🔒 **Immutable**: New container is created without mutating the original
 
-## 📥 Installation
+## Installation
 
 Choose your preferred package manager:
 
@@ -26,7 +26,7 @@ pnpm install @perasite/tdi   # pnpm
 yarn add @perasite/tdi       # yarn
 ```
 
-## 📘 Usage Examples
+## Usage Examples
 
 ### 1️⃣ Basic DI Container
 Create a container and add dependencies with automatic type inference. Access dependencies through the `items` property or `get()` method.
@@ -191,12 +191,12 @@ await prodContainer.get('userService').printName(1); // User 1 from Database
 await testContainer.get('userService').printName(1); // Mock User
 ```
 
-## 💬 Support
+## Support
 
 - 📫 Create an [issue](https://github.com/PeraSite/tdi/issues) for bug reports
 - 💡 Start a [discussion](https://github.com/PeraSite/tdi/discussions) for feature requests
 - 🤔 Ask questions in the [discussions](https://github.com/PeraSite/tdi/discussions) section
 
-## 📝 License
+## License
 
 MIT © [PeraSite](https://github.com/PeraSite)
