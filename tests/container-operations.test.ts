@@ -294,8 +294,9 @@ describe('Container Operations', () => {
         it('preserves lazy evaluation when upserting tokens', () => {
             const container1 = createContainer().add({
                 name: 'John',
-                greeting: (ctx: any) => `Hello, ${ctx.name}`,
-            });
+            }).add(ctx => ({
+                greeting: `Hello, ${ctx.name}`,
+            }));
             const container2 = createContainer().add({
                 name: 'Jane',
                 title: 'Ms.',
