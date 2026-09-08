@@ -16,16 +16,16 @@ importers:
         version: 3.5.3
       tsup:
         specifier: ^8.4.0
-        version: 8.4.0(postcss@8.4.49)(tsx@4.19.3)(typescript@5.8.2)
+        version: 8.4.0(postcss@8.4.49)(tsx@4.19.3)(typescript@5.9.3)
       tsx:
         specifier: ^4.19.3
         version: 4.19.3
       typescript:
-        specifier: ^5.8.2
-        version: 5.8.2
+        specifier: ^5.9.3
+        version: 5.9.3
       vite-tsconfig-paths:
         specifier: ^5.1.4
-        version: 5.1.4(typescript@5.8.2)(vite@5.4.11)
+        version: 5.1.4(typescript@5.9.3)(vite@5.4.11)
       vitest:
         specifier: ^5.0.0
         version: 5.0.0(@vitest/coverage-v8@2.1.8)(vite@5.4.11)
@@ -957,8 +957,8 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-  typescript@5.8.2:
-    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -1765,11 +1765,11 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  tsconfck@3.1.4(typescript@5.8.2):
+  tsconfck@3.1.4(typescript@5.9.3):
     optionalDependencies:
-      typescript: 5.8.2
+      typescript: 5.9.3
 
-  tsup@8.4.0(postcss@8.4.49)(tsx@4.19.3)(typescript@5.8.2):
+  tsup@8.4.0(postcss@8.4.49)(tsx@4.19.3)(typescript@5.9.3):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.25.1)
       cac: 6.7.14
@@ -1789,7 +1789,7 @@ snapshots:
       tree-kill: 1.2.2
     optionalDependencies:
       postcss: 8.4.49
-      typescript: 5.8.2
+      typescript: 5.9.3
     transitivePeerDependencies:
       - jiti
       - supports-color
@@ -1803,13 +1803,13 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  typescript@5.8.2: {}
+  typescript@5.9.3: {}
 
-  vite-tsconfig-paths@5.1.4(typescript@5.8.2)(vite@5.4.11):
+  vite-tsconfig-paths@5.1.4(typescript@5.9.3)(vite@5.4.11):
     dependencies:
       debug: 4.4.0
       globrex: 0.1.2
-      tsconfck: 3.1.4(typescript@5.8.2)
+      tsconfck: 3.1.4(typescript@5.9.3)
     optionalDependencies:
       vite: 5.4.11
     transitivePeerDependencies:
